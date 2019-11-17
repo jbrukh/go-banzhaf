@@ -1,1 +1,3 @@
-module github.com/jbrukh/gobanzhaf
+module github.com/jbrukh/go-banzhaf
+
+go 1.12
