@@ -1,5 +1,11 @@
 package banzhaf
 
+import (
+	"fmt"
+	"log"
+	"math/big"
+)
+
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
 // to true, then the absolute Banzhaf power index is returned.
@@ -35,6 +41,8 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, ok
 		}
 	}
 
+	log.Printf("poly=%v\n", polynomial)
+
 	var (
 		power   = make([]uint64, n)
 		swings  = make([]uint64, quota)
@@ -56,26 +64,35 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, ok
 	}
 
 	var (
-		denom uint64
-		d     float64
+		denom = big.NewInt(0)
 	)
 
 	// absolute Banzhaf power index
 	if absolute {
-		for _, c := range polynomial {
-			denom += c
+		l := len(polynomial)
+
+		for i := 0; i < l/2; i++ {
+			denom.Add(denom, new(big.Int).SetUint64(polynomial[i]))
+			fmt.Printf("den=%v, ", denom)
 		}
-		d = float64(denom) / 2
+		if l%2 == 1 {
+			denom.Add(denom, new(big.Int).SetUint64(polynomial[l/2]/2))
+			fmt.Printf("den=%v.\n", denom)
+		}
+
+		log.Printf("l=%d, d=%v\n", len(polynomial), denom)
+
 	} else { // normalized Banzhaf power index
 		for _, p := range power {
-			denom += p
+			denom.Add(denom, new(big.Int).SetUint64(p))
 		}
-		d = float64(denom)
 	}
 
 	index = make([]float64, n)
+	d := new(big.Float).SetInt(denom)
 	for i := range index {
-		index[i] = float64(power[i]) / d
+		p := new(big.Float).SetUint64(power[i])
+		index[i], _ = new(big.Float).Quo(p, d).Float64()
 	}
 
 	return index, true
