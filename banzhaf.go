@@ -1,7 +1,6 @@
 package banzhaf
 
 import (
-	"fmt"
 	"log"
 	"math/big"
 )
@@ -49,6 +48,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, ok
 		i, j, k uint64
 	)
 
+	// count swings and banzhaf power
 	for i = uint64(0); i < n; i++ {
 		w := weights[i]
 		for j = uint64(0); j < quota; j++ {
@@ -67,22 +67,25 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, ok
 		denom = big.NewInt(0)
 	)
 
-	// absolute Banzhaf power index
 	if absolute {
+
+		// absolute Banzhaf power index takes
+		// the denominator as all the possible outcomes
 		l := len(polynomial)
 
 		for i := 0; i < l/2; i++ {
 			denom.Add(denom, new(big.Int).SetUint64(polynomial[i]))
-			fmt.Printf("den=%v, ", denom)
 		}
 		if l%2 == 1 {
 			denom.Add(denom, new(big.Int).SetUint64(polynomial[l/2]/2))
-			fmt.Printf("den=%v.\n", denom)
 		}
 
 		log.Printf("l=%d, d=%v\n", len(polynomial), denom)
 
-	} else { // normalized Banzhaf power index
+	} else {
+
+		// normalized Banzhaf power index takes the
+		// denominator as all possible swings
 		for _, p := range power {
 			denom.Add(denom, new(big.Int).SetUint64(p))
 		}
