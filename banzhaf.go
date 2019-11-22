@@ -2,7 +2,6 @@ package banzhaf
 
 import (
 	"fmt"
-	"log"
 	"math/big"
 )
 
@@ -45,8 +44,6 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		}
 	}
 
-	log.Printf("poly=%v\n", polynomial)
-
 	var (
 		// an array counting Banzhaf power (swings)
 		power = make([]uint64, n)
@@ -79,7 +76,6 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		// everyone else other than this player participates
 		// which is 2^(n-1)
 		denom.Exp(big.NewInt(2), new(big.Int).SetUint64(n-1), nil)
-		log.Printf("l=%d, d=%v\n", len(polynomial), denom)
 	} else {
 		// normalized Banzhaf power index takes the
 		// denominator as all possible swings

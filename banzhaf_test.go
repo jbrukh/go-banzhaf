@@ -121,17 +121,17 @@ func TestBasic(t *testing.T) {
 
 	t.Run("quota long array", func(t *testing.T) {
 		var (
-			n        = 100000
-			quota    = uint64(n/2 + 1)
-			absolute = false
+			n        = 9
+			quota    = uint64(46)
+			absolute = true
 			weights  []uint64
 			want     []float64
 		)
 		for i := 0; i < n; i++ {
-			weights = append(weights, 1)
-			want = append(want, 0.00001)
+			weights = append(weights, 10)
+			want = append(want, 0.2734375)
 		}
-		tolerance = big.NewFloat(0.000001)
+		tolerance = big.NewFloat(0)
 		testBanzhaf(t, weights, quota, absolute, want, tolerance)
 	})
 
