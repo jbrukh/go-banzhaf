@@ -11,8 +11,15 @@ import (
 // to true, then the absolute Banzhaf power index is returned.
 func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, err error) {
 
-	// get the total
-	var total uint64
+	var (
+		total      uint64   // total votes
+		n          uint64   // number of players
+		order      uint64   // maximum order of the polynomial
+		polynomial []uint64 // polynomial generator
+		i, j, k    uint64   // indices
+	)
+
+	// calculate the total votes
 	for _, w := range weights {
 		total += w
 	}
@@ -23,20 +30,17 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, er
 	}
 
 	// n
-	n := uint64(len(weights))
+	n = uint64(len(weights))
 
 	// polynomial
-	polynomial := make([]uint64, total+1)
+	polynomial = make([]uint64, total+1)
 	polynomial[0] = 1
-
-	// max order
-	var order uint64
 
 	// get polynomial weights
 	for _, w := range weights {
 		order += w
 		offset := append(make([]uint64, w), polynomial...)
-		for j := uint64(0); j <= order; j++ {
+		for j = 0; j <= order; j++ {
 			polynomial[j] += offset[j]
 		}
 	}
@@ -44,27 +48,30 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, er
 	log.Printf("poly=%v\n", polynomial)
 
 	var (
-		power   = make([]uint64, n)
-		swings  = make([]uint64, quota)
-		i, j, k uint64
+		// an array counting Banzhaf power (swings)
+		power = make([]uint64, n)
+
+		// an array counting all swings
+		swings = make([]uint64, quota)
+
+		// denominator for the power index
+		denom = big.NewInt(0)
 	)
 
 	// count swings and banzhaf power
-	for i = uint64(0); i < n; i++ {
+	for i = 0; i < n; i++ {
 		w := weights[i]
-		for j = uint64(0); j < quota; j++ {
+		for j = 0; j < quota; j++ {
 			if j < w {
 				swings[j] = polynomial[j]
 			} else {
 				swings[j] = polynomial[j] - swings[j-w]
 			}
 		}
-		for k = uint64(0); k < w; k++ {
+		for k = 0; k < w; k++ {
 			power[i] += swings[quota-1-k]
 		}
 	}
-
-	var denom = big.NewInt(0)
 
 	if absolute {
 		// absolute Banzhaf power index takes the
