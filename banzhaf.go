@@ -64,27 +64,16 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, er
 		}
 	}
 
-	var (
-		denom = big.NewInt(0)
-	)
+	var denom = big.NewInt(0)
 
 	if absolute {
-
-		// absolute Banzhaf power index takes
-		// the denominator as all the possible outcomes
-		l := len(polynomial)
-
-		for i := 0; i < l/2; i++ {
-			denom.Add(denom, new(big.Int).SetUint64(polynomial[i]))
-		}
-		if l%2 == 1 {
-			denom.Add(denom, new(big.Int).SetUint64(polynomial[l/2]/2))
-		}
-
+		// absolute Banzhaf power index takes the
+		// denominator as all possible votes where
+		// everyone else other than this player participates
+		// which is 2^(n-1)
+		denom.Exp(big.NewInt(2), new(big.Int).SetUint64(n-1), nil)
 		log.Printf("l=%d, d=%v\n", len(polynomial), denom)
-
 	} else {
-
 		// normalized Banzhaf power index takes the
 		// denominator as all possible swings
 		for _, p := range power {
