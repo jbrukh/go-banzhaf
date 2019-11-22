@@ -1,6 +1,7 @@
 package banzhaf
 
 import (
+	"fmt"
 	"log"
 	"math/big"
 )
@@ -8,7 +9,7 @@ import (
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
 // to true, then the absolute Banzhaf power index is returned.
-func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, ok bool) {
+func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, err error) {
 
 	// get the total
 	var total uint64
@@ -18,7 +19,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, ok
 
 	// check quota
 	if quota > total || quota <= total/2 {
-		return nil, false
+		return nil, fmt.Errorf("the quota is out of bounds: (%d,%d]", total, total/2)
 	}
 
 	// n
@@ -98,5 +99,5 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, ok
 		index[i], _ = new(big.Float).Quo(p, d).Float64()
 	}
 
-	return index, true
+	return index, nil
 }

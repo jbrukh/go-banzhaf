@@ -56,13 +56,17 @@ func TestBasic(t *testing.T) {
 		testBanzhaf(t, weights, quota, absolute, want)
 	})
 
+	t.Run("zero case", func(t *testing.T) {
+
+	})
+
 }
 
 func testBanzhaf(t *testing.T, weights []uint64, quota uint64, absolute bool, want []float64) {
-	got, ok := Banzhaf(weights, quota, absolute)
 
-	if !ok {
-		t.Errorf("function returned an error")
+	got, err := Banzhaf(weights, quota, absolute)
+	if err != nil {
+		t.Error(err)
 	}
 
 	if !reflect.DeepEqual(got, want) {
