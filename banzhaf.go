@@ -9,7 +9,7 @@ import (
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
 // to true, then the absolute Banzhaf power index is returned.
-func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, err error) {
+func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float, err error) {
 
 	var (
 		total      uint64   // total votes
@@ -26,7 +26,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, er
 
 	// check quota
 	if quota > total || quota <= total/2 {
-		return nil, fmt.Errorf("the quota is out of bounds: (%d,%d]", total, total/2)
+		return nil, fmt.Errorf("the quota is out of bounds: [%d,%d]", total/2+1, total)
 	}
 
 	// n
@@ -88,11 +88,11 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []float64, er
 		}
 	}
 
-	index = make([]float64, n)
+	index = make([]*big.Float, n)
 	d := new(big.Float).SetInt(denom)
 	for i := range index {
 		p := new(big.Float).SetUint64(power[i])
-		index[i], _ = new(big.Float).Quo(p, d).Float64()
+		index[i] = new(big.Float).Quo(p, d)
 	}
 
 	return index, nil
