@@ -14,8 +14,8 @@ Given a weighted voting system with a quota and weights, use the `Banzhaf` funct
     quota := uint64(4)
     absolute := true
     
-    index, ok := Banzhaf(weights, quota, absolute)
-    if !ok {
+    index, err := Banzhaf(weights, quota, absolute)
+    if err != nil {
       // error
     }
 
