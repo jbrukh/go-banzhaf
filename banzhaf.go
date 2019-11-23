@@ -2,7 +2,9 @@ package banzhaf
 
 import (
 	"fmt"
+	"log"
 	"math/big"
+	"time"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -36,21 +38,25 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	// n
 	n = uint64(len(weights))
 
+	start := time.Now()
+
 	// polynomial
 	polynomial = zeroSlice(total + 1)
 	polynomial[0] = big.NewInt(1)
 
-	bar := pb.StartNew(int(n * total))
 	// get polynomial weights
 	for _, w := range weights {
 		order += w
-		offset := append(zeroSlice(w), polynomial...)
-		for j = 0; j <= order; j++ {
-			polynomial[j] = new(big.Int).Add(polynomial[j], offset[j])
+		aux := append([]*big.Int{}, polynomial...)
+		for j = w; j <= order; j++ {
+			polynomial[j] = new(big.Int).Add(aux[j], aux[j-w])
 		}
-		bar.Add(int(total))
+		//log.Printf("p=%v\n", polynomial)
 	}
-	bar.Finish()
+
+	end := time.Since(start)
+	//log.Printf("poly=%v\n", polynomial)
+	log.Printf("time: %v\n", end)
 
 	var (
 		// an array counting Banzhaf power (swings)
@@ -64,7 +70,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	)
 
 	// count swings and banzhaf power
-	bar = pb.StartNew(int(n * total))
+	bar := pb.StartNew(int(n * total))
 	for i = 0; i < n; i++ {
 		w := weights[i]
 		for j = 0; j < quota; j++ {
