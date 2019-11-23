@@ -2,6 +2,7 @@ package banzhaf
 
 import (
 	"fmt"
+	"log"
 	"math/big"
 )
 
@@ -11,11 +12,11 @@ import (
 func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float, err error) {
 
 	var (
-		total      uint64   // total votes
-		n          uint64   // number of players
-		order      uint64   // maximum order of the polynomial
-		polynomial []uint64 // polynomial generator
-		i, j, k    uint64   // indices
+		total      uint64     // total votes
+		n          uint64     // number of players
+		order      uint64     // maximum order of the polynomial
+		polynomial []*big.Int // polynomial generator
+		i, j, k    uint64     // indices
 	)
 
 	// calculate the total votes
@@ -32,24 +33,38 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	n = uint64(len(weights))
 
 	// polynomial
-	polynomial = make([]uint64, total+1)
-	polynomial[0] = 1
+	polynomial = zeroSlice(total + 1)
+	polynomial[0] = big.NewInt(1)
 
 	// get polynomial weights
 	for _, w := range weights {
 		order += w
-		offset := append(make([]uint64, w), polynomial...)
+		offset := append(zeroSlice(w), polynomial...)
 		for j = 0; j <= order; j++ {
-			polynomial[j] += offset[j]
+			polynomial[j] = new(big.Int).Add(polynomial[j], offset[j])
 		}
+		// for i, item := range polynomial {
+		// 	fmt.Printf("%v", item)
+		// 	if i != len(polynomial)-1 {
+		// 		fmt.Printf(" ")
+		// 	} else {
+		// 		fmt.Printf("\n")
+		// 	}
+		// }
 	}
+
+	log.Printf("poly=%v\n", polynomial)
+	// log.Printf("len=%d\n", len(polynomial))
+	// for _, item := range polynomial {
+	// 	fmt.Printf("%v\n", item)
+	// }
 
 	var (
 		// an array counting Banzhaf power (swings)
-		power = make([]uint64, n)
+		power = zeroSlice(n)
 
 		// an array counting all swings
-		swings = make([]uint64, quota)
+		swings = zeroSlice(quota)
 
 		// denominator for the power index
 		denom = big.NewInt(0)
@@ -62,13 +77,15 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 			if j < w {
 				swings[j] = polynomial[j]
 			} else {
-				swings[j] = polynomial[j] - swings[j-w]
+				swings[j] = new(big.Int).Sub(polynomial[j], swings[j-w])
 			}
 		}
 		for k = 0; k < w; k++ {
-			power[i] += swings[quota-1-k]
+			power[i] = new(big.Int).Add(power[i], swings[quota-1-k])
 		}
 	}
+
+	log.Printf("\npower=%v\n\nswings=%v\n\n", power, swings)
 
 	if absolute {
 		// absolute Banzhaf power index takes the
@@ -80,16 +97,24 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		// normalized Banzhaf power index takes the
 		// denominator as all possible swings
 		for _, p := range power {
-			denom.Add(denom, new(big.Int).SetUint64(p))
+			denom.Add(denom, p)
 		}
 	}
 
 	index = make([]*big.Float, n)
 	d := new(big.Float).SetInt(denom)
 	for i := range index {
-		p := new(big.Float).SetUint64(power[i])
+		p := new(big.Float).SetInt(power[i])
 		index[i] = new(big.Float).Quo(p, d)
 	}
 
 	return index, nil
+}
+
+func zeroSlice(n uint64) []*big.Int {
+	v := make([]*big.Int, n)
+	for i := range v {
+		v[i] = big.NewInt(0)
+	}
+	return v
 }
