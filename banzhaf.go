@@ -2,9 +2,7 @@ package banzhaf
 
 import (
 	"fmt"
-	"log"
 	"math/big"
-	"time"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -38,8 +36,6 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	// n
 	n = uint64(len(weights))
 
-	start := time.Now()
-
 	// polynomial
 	P = zeroSlice(total + 1)
 	P[0] = big.NewInt(1)
@@ -54,12 +50,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		for j = order; j >= w; j-- {
 			P[j] = new(big.Int).Add(P[j], P[j-w])
 		}
-		//log.Printf("p=%v\n", polynomial)
 	}
-
-	end := time.Since(start)
-	//log.Printf("poly=%v\n", polynomial)
-	log.Printf("time for poly (%d): %v\n", n, end)
 
 	var (
 		// an array counting Banzhaf power (swings)
@@ -74,7 +65,6 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 
 	// count swings and banzhaf power
 	bar := pb.StartNew(int(n * total))
-	start = time.Now()
 	for i = 0; i < n; i++ {
 		w := weights[i]
 		for j = 0; j < quota; j++ {
@@ -89,8 +79,6 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		}
 		bar.Add(int(total))
 	}
-	end = time.Since(start)
-	log.Printf("time for power (%d): %v", n, end)
 	bar.Finish()
 
 	if absolute {
