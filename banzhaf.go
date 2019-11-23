@@ -44,19 +44,23 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	polynomial = zeroSlice(total + 1)
 	polynomial[0] = big.NewInt(1)
 
+	compute := func(p []*big.Int, j, w uint64) {
+		p[j] = new(big.Int).Add(p[j], p[j-w])
+	}
+
 	// get polynomial weights
 	for _, w := range weights {
 		order += w
-		aux := append([]*big.Int{}, polynomial...)
-		for j = w; j <= order; j++ {
-			polynomial[j] = new(big.Int).Add(aux[j], aux[j-w])
+		//aux := append([]*big.Int{}, polynomial...)
+		for j = order; j >= w; j-- {
+			compute(polynomial, j, w)
 		}
 		//log.Printf("p=%v\n", polynomial)
 	}
 
 	end := time.Since(start)
 	//log.Printf("poly=%v\n", polynomial)
-	log.Printf("time: %v\n", end)
+	log.Printf("time for poly (%d): %v\n", n, end)
 
 	var (
 		// an array counting Banzhaf power (swings)
@@ -71,6 +75,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 
 	// count swings and banzhaf power
 	bar := pb.StartNew(int(n * total))
+	start = time.Now()
 	for i = 0; i < n; i++ {
 		w := weights[i]
 		for j = 0; j < quota; j++ {
@@ -85,6 +90,8 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		}
 		bar.Add(int(total))
 	}
+	end = time.Since(start)
+	log.Printf("time for power (%d): %v", n, end)
 	bar.Finish()
 
 	if absolute {

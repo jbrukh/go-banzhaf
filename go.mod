@@ -7,4 +7,5 @@ require (
 	github.com/cockroachdb/apd/v2 v2.0.1
 	github.com/go-test/deep v1.0.4
 	github.com/google/go-cmp v0.3.1
+	github.com/ncw/gmp v1.0.4
 )
