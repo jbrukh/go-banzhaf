@@ -3,6 +3,8 @@ package banzhaf
 import (
 	"fmt"
 	"math/big"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 // zero is the zero value of big.Int.
@@ -38,6 +40,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	polynomial = zeroSlice(total + 1)
 	polynomial[0] = big.NewInt(1)
 
+	bar := pb.StartNew(int(n * total))
 	// get polynomial weights
 	for _, w := range weights {
 		order += w
@@ -45,7 +48,9 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		for j = 0; j <= order; j++ {
 			polynomial[j] = new(big.Int).Add(polynomial[j], offset[j])
 		}
+		bar.Add(int(total))
 	}
+	bar.Finish()
 
 	var (
 		// an array counting Banzhaf power (swings)
@@ -59,6 +64,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	)
 
 	// count swings and banzhaf power
+	bar = pb.StartNew(int(n * total))
 	for i = 0; i < n; i++ {
 		w := weights[i]
 		for j = 0; j < quota; j++ {
@@ -71,7 +77,9 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		for k = 0; k < w; k++ {
 			power[i] = new(big.Int).Add(power[i], swings[quota-1-k])
 		}
+		bar.Add(int(total))
 	}
+	bar.Finish()
 
 	if absolute {
 		// absolute Banzhaf power index takes the
