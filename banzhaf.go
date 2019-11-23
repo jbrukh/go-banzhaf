@@ -18,11 +18,11 @@ var zero = big.NewInt(0)
 func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float, err error) {
 
 	var (
-		total      uint64     // total votes
-		n          uint64     // number of players
-		order      uint64     // maximum order of the polynomial
-		polynomial []*big.Int // polynomial generator
-		i, j, k    uint64     // indices
+		total   uint64     // total votes
+		n       uint64     // number of players
+		order   uint64     // maximum order of the polynomial
+		P       []*big.Int // polynomial generator function
+		i, j, k uint64     // indices
 	)
 
 	// calculate the total votes
@@ -41,19 +41,18 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	start := time.Now()
 
 	// polynomial
-	polynomial = zeroSlice(total + 1)
-	polynomial[0] = big.NewInt(1)
+	P = zeroSlice(total + 1)
+	P[0] = big.NewInt(1)
 
-	compute := func(p []*big.Int, j, w uint64) {
-		p[j] = new(big.Int).Add(p[j], p[j-w])
-	}
-
-	// get polynomial weights
+	// Get polynomial weights. This function multiplies out
+	//
+	//   (1+x^w(0))(1+x^w(1))...(1+x^w(n-1))
+	//
+	// where w(k) are the weights (k=0,...,n-1).
 	for _, w := range weights {
 		order += w
-		//aux := append([]*big.Int{}, polynomial...)
 		for j = order; j >= w; j-- {
-			compute(polynomial, j, w)
+			P[j] = new(big.Int).Add(P[j], P[j-w])
 		}
 		//log.Printf("p=%v\n", polynomial)
 	}
@@ -80,9 +79,9 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		w := weights[i]
 		for j = 0; j < quota; j++ {
 			if j < w {
-				swings[j] = polynomial[j]
+				swings[j] = P[j]
 			} else {
-				swings[j] = new(big.Int).Sub(polynomial[j], swings[j-w])
+				swings[j] = new(big.Int).Sub(P[j], swings[j-w])
 			}
 		}
 		for k = 0; k < w; k++ {
