@@ -2,9 +2,11 @@ package banzhaf
 
 import (
 	"fmt"
-	"log"
 	"math/big"
 )
+
+// zero is the zero value of big.Int.
+var zero = big.NewInt(0)
 
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
@@ -43,21 +45,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		for j = 0; j <= order; j++ {
 			polynomial[j] = new(big.Int).Add(polynomial[j], offset[j])
 		}
-		// for i, item := range polynomial {
-		// 	fmt.Printf("%v", item)
-		// 	if i != len(polynomial)-1 {
-		// 		fmt.Printf(" ")
-		// 	} else {
-		// 		fmt.Printf("\n")
-		// 	}
-		// }
 	}
-
-	log.Printf("poly=%v\n", polynomial)
-	// log.Printf("len=%d\n", len(polynomial))
-	// for _, item := range polynomial {
-	// 	fmt.Printf("%v\n", item)
-	// }
 
 	var (
 		// an array counting Banzhaf power (swings)
@@ -85,8 +73,6 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		}
 	}
 
-	log.Printf("\npower=%v\n\nswings=%v\n\n", power, swings)
-
 	if absolute {
 		// absolute Banzhaf power index takes the
 		// denominator as all possible votes where
@@ -111,10 +97,12 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	return index, nil
 }
 
+// zeroSlice creates a new []*big.Int slice of size n and sets
+// each item to big.NewInt(0)
 func zeroSlice(n uint64) []*big.Int {
 	v := make([]*big.Int, n)
 	for i := range v {
-		v[i] = big.NewInt(0)
+		v[i] = zero
 	}
 	return v
 }
