@@ -40,6 +40,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	P = zeroSlice(total + 1)
 	P[0] = big.NewInt(1)
 
+	bar := pb.StartNew(int(n * total))
 	// Get polynomial weights. This function multiplies out
 	//
 	//   (1+x^w(0))(1+x^w(1))...(1+x^w(n-1))
@@ -50,7 +51,9 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		for j = order; j >= w; j-- {
 			P[j] = new(big.Int).Add(P[j], P[j-w])
 		}
+		bar.Add(int(total))
 	}
+	bar.Finish()
 
 	var (
 		// an array counting Banzhaf power (swings)
@@ -64,7 +67,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	)
 
 	// count swings and banzhaf power
-	bar := pb.StartNew(int(n * total))
+	bar = pb.StartNew(int(n * total))
 	for i = 0; i < n; i++ {
 		w := weights[i]
 		for j = 0; j < quota; j++ {
