@@ -113,13 +113,16 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 
 func BanzhafApprox(weights []uint64, quota uint64, confidence, width float64) ([]*big.Float, error) {
 	result := make([]*big.Float, len(weights))
+	bar := pb.StartNew(len(weights))
 	for i := range weights {
 		est, err := banzhafApprox(weights, quota, confidence, width, i)
 		if err != nil {
 			return nil, err
 		}
 		result[i] = new(big.Float).SetFloat64(est)
+		bar.Add(1)
 	}
+	bar.Finish()
 	return result, nil
 }
 
