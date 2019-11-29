@@ -2,7 +2,10 @@ package banzhaf
 
 import (
 	"fmt"
+	"math"
 	"math/big"
+	"math/rand"
+	"time"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -106,6 +109,47 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	}
 
 	return index, nil
+}
+
+func BanzhafApprox(weights []uint64, quota uint64, confidence, width float64) ([]*big.Float, error) {
+	result := make([]*big.Float, len(weights))
+	for i := range weights {
+		est, err := banzhafApprox(weights, quota, confidence, width, i)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = new(big.Float).SetFloat64(est)
+	}
+	return result, nil
+}
+
+func banzhafApprox(weights []uint64, quota uint64, confidence, width float64, i int) (est float64, err error) {
+	rand.Seed(time.Now().UnixNano())
+	var (
+		x, k    uint64
+		epsilon = width / 2.0
+	)
+	for {
+		thresh := math.Log(2/confidence) / (2 * epsilon * epsilon)
+		if float64(k) > thresh {
+			break
+		}
+
+		// randomly choose coalition C which contains i
+		var vote uint64
+		for j, w := range weights {
+			if j != i && rand.Intn(2) == 1 {
+				vote += w
+			}
+		}
+		k++
+		// determine if critical
+		if vote < quota && vote+weights[i] >= quota {
+			x++
+		}
+		est = float64(x) / float64(k)
+	}
+	return
 }
 
 // zeroSlice creates a new []*big.Int slice of size n and sets

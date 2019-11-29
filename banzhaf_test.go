@@ -1,6 +1,7 @@
 package banzhaf
 
 import (
+	"log"
 	"math/big"
 	"testing"
 )
@@ -134,7 +135,21 @@ func TestBasic(t *testing.T) {
 		tolerance = big.NewFloat(0)
 		testBanzhaf(t, weights, quota, absolute, want, tolerance)
 	})
+}
 
+func TestApprox(t *testing.T) {
+
+	t.Run("basic absolute", func(t *testing.T) {
+		var (
+			weights    = []uint64{3, 2, 2, 1}
+			quota      = uint64(5)
+			confidence = 0.001
+			width      = 0.001
+			i          = 0
+			want       = .25
+		)
+		testBanzhafApprox(t, weights, quota, confidence, width, i, want)
+	})
 }
 
 func testBanzhaf(t *testing.T, weights []uint64, quota uint64, absolute bool, want []float64, tolerance *big.Float) {
@@ -177,4 +192,13 @@ func testBanzhafErr(t *testing.T, weights []uint64, quota uint64, absolute bool)
 	if err == nil {
 		t.Errorf("expecting an error but got: %v", err)
 	}
+}
+
+func testBanzhafApprox(t *testing.T, weights []uint64, quota uint64, confidence, width float64, i int, want float64) {
+	got, err := BanzhafApprox(weights, quota, confidence, width)
+	if err != nil {
+		t.Error(err)
+	}
+
+	log.Printf("b_hat = %v\n", got)
 }
