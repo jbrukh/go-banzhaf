@@ -12,7 +12,7 @@ var zero = big.NewInt(0)
 
 // NoProgressBar determines whether a progress is output
 // to the standard error to show progress of the calculation.
-var NoProgressBar = false
+var NoProgressBar = true
 
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
@@ -113,9 +113,12 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 			bar.Add(int(total))
 		}
 	}
+
+	// progress bar
 	if !NoProgressBar {
 		bar.Finish()
 	}
+
 	if absolute {
 		// absolute Banzhaf power index takes the
 		// denominator as all possible votes where
