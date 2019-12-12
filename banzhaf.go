@@ -10,9 +10,9 @@ import (
 // zero is the zero value of big.Int.
 var zero = big.NewInt(0)
 
-// NoProgressBar determines whether a progress is output
+// ProgressBar determines whether a progress is output
 // to the standard error to show progress of the calculation.
-var NoProgressBar = true
+var ProgressBar = false
 
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
@@ -54,7 +54,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	P[0] = big.NewInt(1)
 
 	// progress bar
-	if !NoProgressBar {
+	if ProgressBar {
 		bar = pb.StartNew(int(n * total))
 	}
 
@@ -70,13 +70,13 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		}
 
 		// progress bar
-		if !NoProgressBar {
+		if ProgressBar {
 			bar.Add(int(total))
 		}
 	}
 
 	// finish progress bars
-	if !NoProgressBar {
+	if ProgressBar {
 		bar.Finish()
 	}
 
@@ -92,7 +92,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	)
 
 	// count swings and banzhaf power
-	if !NoProgressBar {
+	if ProgressBar {
 		bar = pb.StartNew(int(n * total))
 	}
 	for i = 0; i < n; i++ {
@@ -109,13 +109,13 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		}
 
 		// progress bar
-		if !NoProgressBar {
+		if ProgressBar {
 			bar.Add(int(total))
 		}
 	}
 
 	// progress bar
-	if !NoProgressBar {
+	if ProgressBar {
 		bar.Finish()
 	}
 

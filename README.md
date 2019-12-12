@@ -21,6 +21,12 @@ Given a weighted voting system with a quota and weights, use the `Banzhaf` funct
       // error
     }
 
+# Progress Output
+
+For debugging purposes, you can enable a progress bar which will be output to the standard error.
+
+    banzhaf.ProgressBar = true
+
 # References
 
 * [Are blockchain voters 'dummies'?](https://blog.coinfund.io/are-blockchain-voters-dummies-4a89a376de69) by @jbrukh.
