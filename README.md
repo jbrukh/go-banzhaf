@@ -6,7 +6,7 @@ Go implementation of Banzhaf power index calculation.
 
 # Background
 
-The Banzhaf power index is one way to measure voting power in a weighted voting system. This package provides an algorithm which calculates absolute and normalized Banzhaf voting power indices. The Banzhaf and other power indices from cooperative game theory, see some leads in the references section below.
+The Banzhaf power index is one way to measure voting power in a weighted voting system. This package provides an algorithm which calculates absolute and normalized Banzhaf voting power indices. The Banzhaf and other power indices from cooperative game theory have a sizeable literature: see some leads in the references section below.
 
 # Quickstart
 
