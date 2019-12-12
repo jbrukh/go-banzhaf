@@ -12,7 +12,15 @@ var zero = big.NewInt(0)
 
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
-// to true, then the absolute Banzhaf power index is returned.
+// to true, then the absolute Banzhaf power index is returned. Otherwise, the
+// relative Banzhaf power index is returned.
+//
+// The quota should be an integer greater than half the total number of votes
+// and less than the total number of votes.
+//
+// This implementation of the Banzhaf calculation uses a generator function
+// approach and should run in around O(n^2) where n is the number
+// of players and t is the total voting weight of the system.
 func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float, err error) {
 
 	var (
