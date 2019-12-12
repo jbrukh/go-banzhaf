@@ -146,6 +146,7 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	return index, nil
 }
 
+// BanzhafApprox will approximate the Banzhaf power index.
 func BanzhafApprox(weights []uint64, quota uint64, confidence, width float64) ([]*big.Float, error) {
 	result := make([]*big.Float, len(weights))
 	bar := pb.StartNew(len(weights))
