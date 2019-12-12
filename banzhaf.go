@@ -10,6 +10,10 @@ import (
 // zero is the zero value of big.Int.
 var zero = big.NewInt(0)
 
+// NoProgressBar determines whether a progress is output
+// to the standard error to show progress of the calculation.
+var NoProgressBar = false
+
 // Banzhaf returns the Banzhaf power index associated with a weighted voting
 // system defined by the `weights` and `quota` provided. If `absolute` is set
 // to true, then the absolute Banzhaf power index is returned. Otherwise, the
@@ -24,11 +28,12 @@ var zero = big.NewInt(0)
 func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float, err error) {
 
 	var (
-		total   uint64     // total votes
-		n       uint64     // number of players
-		order   uint64     // maximum order of the polynomial
-		P       []*big.Int // polynomial generator function
-		i, j, k uint64     // indices
+		total   uint64          // total votes
+		n       uint64          // number of players
+		order   uint64          // maximum order of the polynomial
+		P       []*big.Int      // polynomial generator function
+		i, j, k uint64          // indices
+		bar     *pb.ProgressBar // progress bar
 	)
 
 	// calculate the total votes
@@ -48,7 +53,11 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	P = zeroSlice(total + 1)
 	P[0] = big.NewInt(1)
 
-	bar := pb.StartNew(int(n * total))
+	// progress bar
+	if !NoProgressBar {
+		bar = pb.StartNew(int(n * total))
+	}
+
 	// Get polynomial weights. This function multiplies out
 	//
 	//   (1+x^w(0))(1+x^w(1))...(1+x^w(n-1))
@@ -59,9 +68,17 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		for j = order; j >= w; j-- {
 			P[j] = new(big.Int).Add(P[j], P[j-w])
 		}
-		bar.Add(int(total))
+
+		// progress bar
+		if !NoProgressBar {
+			bar.Add(int(total))
+		}
 	}
-	bar.Finish()
+
+	// finish progress bars
+	if !NoProgressBar {
+		bar.Finish()
+	}
 
 	var (
 		// an array counting Banzhaf power (swings)
@@ -75,7 +92,9 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 	)
 
 	// count swings and banzhaf power
-	bar = pb.StartNew(int(n * total))
+	if !NoProgressBar {
+		bar = pb.StartNew(int(n * total))
+	}
 	for i = 0; i < n; i++ {
 		w := weights[i]
 		for j = 0; j < quota; j++ {
@@ -88,10 +107,15 @@ func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float,
 		for k = 0; k < w; k++ {
 			power[i] = new(big.Int).Add(power[i], swings[quota-1-k])
 		}
-		bar.Add(int(total))
-	}
-	bar.Finish()
 
+		// progress bar
+		if !NoProgressBar {
+			bar.Add(int(total))
+		}
+	}
+	if !NoProgressBar {
+		bar.Finish()
+	}
 	if absolute {
 		// absolute Banzhaf power index takes the
 		// denominator as all possible votes where
