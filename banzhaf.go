@@ -23,7 +23,7 @@ var ProgressBar = false
 // and less than the total number of votes.
 //
 // This implementation of the Banzhaf calculation uses a generator function
-// approach and should run in around O(n^2) where n is the number
+// approach and should run in around O(nt) where n is the number
 // of players and t is the total voting weight of the system.
 func Banzhaf(weights []uint64, quota uint64, absolute bool) (index []*big.Float, err error) {
 
