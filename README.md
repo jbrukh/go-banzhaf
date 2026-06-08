@@ -108,6 +108,25 @@ runs.
 
 ## References
 
+Background and tutorials:
+
 * [Are blockchain voters 'dummies'?](https://blog.coinfund.io/are-blockchain-voters-dummies-4a89a376de69) by @jbrukh
 * [Using generator functions to compute power indices](http://www.siue.edu/~aweyhau/teaching/seniorprojects/heger_final.pdf) by Brian Hegers
 * https://gist.github.com/HeinrichHartmann/8ec2e2245f2a70441257 by Heinrich Hartmann
+
+Foundational:
+
+* Banzhaf, J. F. (1965). "Weighted voting doesn't work: A mathematical analysis." *Rutgers Law Review* 19(2): 317–343. — the original index.
+* Penrose, L. S. (1946). "The elementary statistics of majority voting." *Journal of the Royal Statistical Society* 109(1): 53–57. — the absolute index and the Penrose limit (power ∝ weight × density at the quota) that `HighN` exploits.
+* Dubey, P. & Shapley, L. S. (1979). "Mathematical properties of the Banzhaf power index." *Mathematics of Operations Research* 4(2): 99–131.
+
+Exact computation (`Exact`, `Banzhaf`):
+
+* Bilbao, J. M., Fernández, J. R., Jiménez, N. & López, J. J. (2000). "Generating functions for computing power indices efficiently." *TOP* 8(2): 191–213.
+
+Large games & approximation (`HighN`, `NormalApprox`, `MonteCarlo`):
+
+* Owen, G. (1972). "Multilinear extensions of games." *Management Science* 18(5-P2): P64–P79; and Owen, G. (1975). "Multilinear extensions and the Banzhaf value." *Naval Research Logistics Quarterly* 22(4): 741–750. — the multilinear extension underlying the density/normal approximation.
+* Leech, D. (2003). "Computing power indices for large voting games." *Management Science* 49(6): 831–837.
+* Bachrach, Y., Markakis, E., Resnick, E., Procaccia, A. D., Rosenschein, J. S. & Saberi, A. (2010). "Approximating power indices: theoretical and empirical analysis." *Autonomous Agents and Multi-Agent Systems* 20(2): 105–122. — Monte-Carlo estimation with sample bounds.
+* Matsui, T. & Matsui, Y. (2000). "A survey of algorithms for calculating power indices of weighted majority games." *Journal of the Operations Research Society of Japan* 43(1): 71–86.
